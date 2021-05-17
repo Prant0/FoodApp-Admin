@@ -11,6 +11,22 @@ import 'package:home_chef_admin/Widgets/registerTextField.dart';
 import 'package:home_chef_admin/server/http_request.dart';
 import 'package:http/http.dart' as http;
 
+class Pranto{
+
+  int productId;
+  int price;
+  int quantity;
+  Pranto({this.price,this.productId,this.quantity});
+
+  Map toJson() =>{"product":{
+    'product_id': productId,
+    'price': price,
+    'quantity': quantity
+  }};
+
+
+}
+
 class CreateOrderPage extends StatefulWidget {
   @override
   _CreateOrderPageState createState() => _CreateOrderPageState();
@@ -22,24 +38,64 @@ class _CreateOrderPageState extends State<CreateOrderPage>
   final _fullformKey = GlobalKey<FormState>();
   bool onProgress = false;
 
-  // final titleController = TextEditingController();
 
-  /*shipping_area, shipping_contact, shipping_appartment,
-  shipping_house, shipping_road, shipping_city, shipping_district,
-  shipping_zip_code, user_id(optional) , product_id, price,
-   quantity, user_name, user_email, user_password, product[]*/
 
-  //final array = [["product_id"=> "6", "quantity"=> "2", "price"=> "276"]];
+
+  Future<bool> getLogin() async {
+    try {
+      onProgress=true;
+      final uri = Uri.parse("https://apihomechef.antapp.space/api/admin/order/create");
+      var map = Map<dynamic, dynamic>();
+      print("value are the :${areaController.text.toString()},${cityController.text.toString()},${appertmentController.text.toString()}");
+      map['user_id'] = userId;
+      map['shipping_area'] =areaController.text.toString();
+      map['shipping_contact'] =contactController.text.toString();
+      map['shipping_appartment'] =appertmentController.text.toString();
+      map['shipping_house'] =houseController.text.toString();
+      map['shipping_road'] = roadController.text.toString();
+      map['shipping_city'] = cityController.text.toString();
+      map['shipping_district'] = districController.text.toString();
+      map['shipping_zip_code'] = zipController.text.toString();
+      map['product'] =myList;
+      print("body data areeeeeeeeeeeeee ${jsonEncode(map)}");
+      final response = await http.post(uri, 
+          body: jsonEncode(map),
+          
+          headers: await CustomHttpRequest.getHeaderWithToken());
+      final data = jsonDecode(response.body);
+      print(data);
+      print("Pranto the login data are : $data");
+      if (response.statusCode==200) {
+        setState(() {
+          onProgress = false;
+         print("status code 200");
+        });
+
+        // getUserDetails();
+        return true;
+      } else {
+        print("status code not 200");
+        return false;
+      }
+    } catch (e) {
+      if(mounted){
+        setState(() {
+          onProgress = false;
+        });
+      }
+      print("something wrong pranto $e");
+    }
+  }
+
+
 
   Future createOrder(BuildContext context) async{
     try{
-
       if(mounted){
         setState(() {
           onProgress = true;
         });
         var data;
-
         final uri = Uri.parse("https://apihomechef.antapp.space/api/admin/order/create");
         var request = http.MultipartRequest("POST",uri);
         request.headers.addAll(await CustomHttpRequest.getHeaderWithToken());
@@ -52,12 +108,10 @@ class _CreateOrderPageState extends State<CreateOrderPage>
         request.fields['shipping_district'] = districController.text.toString();
         request.fields['shipping_zip_code'] = zipController.text.toString();
         request.fields['product'] = myList.toString();
-       // request.fields['product'] = [{product_id: 6,quantity: 2, price: 276},[product_id: 34, quantity: 2, price: 100]].toString();
+       // request.fields['product'] = [{"product_id": 6,"quantity": 2, price: 276},].toString();
         print(myList.toString());
-
         if(userId != null){
           request.fields['user_id'] = userId;
-
         }else{
           request.fields['user_name'] = nameController.text.toString();
           request.fields['user_email'] = emailController.text.toString();
@@ -71,30 +125,9 @@ class _CreateOrderPageState extends State<CreateOrderPage>
         print("responseBody " + responseString);
         data = jsonDecode(responseString);
         print(data);
-        //var data = jsonDecode(responseString);
-        //showInToast(data['email'].toString());
-        //stay here
+
         print(response.statusCode);
-        // if (response.statusCode == 201) {
-        //   print("responseBody1 " + responseString);
-        //   data = jsonDecode(responseString);
-        //   //var data = jsonDecode(responseString);
-        //   showInToast(data['message'].toString());
-        //
-        //   //go to the login page
-        //   Navigator.pop(context);
-        //
-        // }
-        // else{
-        //   showInToast(data['errors']['image'][0]);
-        //   setState(() {
-        //     onProgress = false;
-        //   });
-        //   var errorr = jsonDecode(responseString.trim().toString());
-        //   //showInToast("Registered Failed, please fill all the fields");
-        //   print("Registered failed " + responseString);
-        //
-        // }
+
       }
     }catch(e){
       print("something went wrong $e");
@@ -114,57 +147,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
     }
     else {
       print("inside decission");
-             print("not empty list:????");
-        /*myList.forEach((element) {
-          print(element['"quantity"']);
-          print('////');
-          print(quantityController.text);
-          if(element['"quantity"'] == quantityController.text){
-            print("${element['"quantity"']} equal to ${quantityController.text}");
-            return showInToast(" product already added");
-          }
-          else if(element['"quantity"'] != quantityController.text){
-            print("${element['"quantity"']} not equal to ${quantityController.text}");
-            myList.add(
-                    {
-                      '"product_id"': 10,
-                      '"product_name"': 'Burger',
-                      '"quantity"': quantityController.text,
-                      '"price"': totalPrice,
-                    },
-                  );
-            quantityController.text = '';
-              totalPrice = null;
-              animate();
-              print("added done");
-              showInToast("Product Added Successfully");
-              print(myList);
-            return;
-          }
-            // if (element['"quantity"'] == quantityController.text) {
-            //   print("here found matching product");
-            //   return showInToast(" product already added");
-            // }
-            // else {
-            //   print("${quantityController.text} here not found matching product, so added");
-            //   myList.add(
-            //     {
-            //       '"product_id"': 10,
-            //       '"product_name"': 'Burger',
-            //       '"quantity"': quantityController.text,
-            //       '"price"': totalPrice,
-            //     },
-            //   );
-            //   quantityController.text = '';
-            //   totalPrice = null;
-            //   animate();
-            //   print("added done");
-            //   showInToast("Product Added Successfully");
-            //   print(myList);
-            //   return;
-            // }
 
-        });*/
         int count = 0;
         for (var i = 0; i < myList.length; i++) {
           //print(quantityController.text);
@@ -195,123 +178,12 @@ class _CreateOrderPageState extends State<CreateOrderPage>
               print(myList);
 
             }
-
-
     }
   }
 
-/*  void submitData(BuildContext context) {
-    print(myList);
-    if (quantityController.text.isEmpty) {
-      print(" cancle first");
-      return;
-    } else {
-      print("inside decission");
-      if (myList.isNotEmpty) {
-        print("not empty list:????");
-        */
-  /*myList.forEach((element) {
-          print(element['"quantity"']);
-          print('////');
-          print(quantityController.text);
-          if(element['"quantity"'] == quantityController.text){
-            print("${element['"quantity"']} equal to ${quantityController.text}");
-            return showInToast(" product already added");
-          }
-          else if(element['"quantity"'] != quantityController.text){
-            print("${element['"quantity"']} not equal to ${quantityController.text}");
-            myList.add(
-                    {
-                      '"product_id"': 10,
-                      '"product_name"': 'Burger',
-                      '"quantity"': quantityController.text,
-                      '"price"': totalPrice,
-                    },
-                  );
-            quantityController.text = '';
-              totalPrice = null;
-              animate();
-              print("added done");
-              showInToast("Product Added Successfully");
-              print(myList);
-            return;
-          }
-            // if (element['"quantity"'] == quantityController.text) {
-            //   print("here found matching product");
-            //   return showInToast(" product already added");
-            // }
-            // else {
-            //   print("${quantityController.text} here not found matching product, so added");
-            //   myList.add(
-            //     {
-            //       '"product_id"': 10,
-            //       '"product_name"': 'Burger',
-            //       '"quantity"': quantityController.text,
-            //       '"price"': totalPrice,
-            //     },
-            //   );
-            //   quantityController.text = '';
-            //   totalPrice = null;
-            //   animate();
-            //   print("added done");
-            //   showInToast("Product Added Successfully");
-            //   print(myList);
-            //   return;
-            // }
 
-        });*/
-  /*
-        for (var i = 0; i < myList.length; i++) {
-          //print(quantityController.text);
-          if (quantityController.text.isNotEmpty) {
-            if (myList[i]['"quantity"'] == quantityController.text) {
 
-              print(quantityController.text);
-              print(myList[i]['"quantity"']);
-              print("here found matching product");
-              showInToast(" product already added");
-              return;
-            } else {
-              print("${quantityController.text} here not found matching product, so added");
-              myList.add(
-                {
-                  '"product_id"': 10,
-                  '"product_name"': 'Burger',
-                  '"quantity"': quantityController.text,
-                  '"price"': totalPrice,
-                },
-              );
-              quantityController.text = '';
-              totalPrice = null;
-              animate();
-              print("added done");
-              showInToast("Product Added Successfully");
-              print(myList);
-              return;
-            }
-          } else {
-            return;
-          }
-        }
-      } else {
-        print('not any more empty:????');
-        myList.add(
-          {
-            '"product_id"': 10,
-            '"product_name"': 'Burger',
-            '"quantity"': quantityController.text,
-            '"price"': totalPrice,
-          },
-        );
-        animate();
-        quantityController.text = '';
-        totalPrice = null;
-        showInToast("Product Added Successfully");
-        print(myList);
-        return;
-      }
-    }
-  }*/
+
 
   showInToast(String value) {
     Fluttertoast.showToast(
@@ -658,8 +530,8 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                     ),
                   ),
                   SizedBox(
-                    height: 20,
-                  ),
+                    height: 20,),
+
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     color: aNavBarColor,
@@ -673,6 +545,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+
                                 Text(
                                   'Product',
                                   style: TextStyle(
@@ -716,10 +589,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                                                     myList[index]['quantity'] =
                                                         quantity;
                                                   });
-                                                  myList[index]['price'] =
-                                                      price *
-                                                          int.parse(myList[index]
-                                                              ['quantity']);
+                                                  myList[index]['price'] = price * int.parse(myList[index]['quantity']);
                                                   print('1st =$quantity');
                                                 }
 
@@ -799,17 +669,11 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                                                               child: myList
                                                                       .isNotEmpty
                                                                   ? RawScrollbar(
-                                                                      thumbColor:
-                                                                          aPrimaryColor,
-                                                                      isAlwaysShown:
-                                                                          true,
-                                                                      thickness:
-                                                                          3.0,
-                                                                      child: ListView
-                                                                          .builder(
-                                                                        itemCount:
-                                                                            myList
-                                                                                .length,
+                                                                      thumbColor: aPrimaryColor,
+                                                                      isAlwaysShown: true,
+                                                                      thickness: 3.0,
+                                                                      child: ListView.builder(
+                                                                        itemCount: myList.length,
                                                                         itemBuilder:
                                                                             (context,
                                                                                 index) {
@@ -1102,6 +966,8 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                                   _formKey.currentState.save();
                                   setState(() {
                                     submitData(context);
+
+
                                   });
                                 }
 
@@ -1123,38 +989,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                               ),
                             ),
                           ),
-                          /*TextButton(
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    List<ProductOrders> products = [];
-                                    // ProductOrders product;
-                                    // products = myList.map((e) => product);
-                                    //myList.firstWhere((element) => element == product.productId);
-                                    //myList.map((e) => product);
-                                    return Dialog(
-                                      child: Container(
-                                        height: MediaQuery.of(context).size.height *
-                                            0.5,
-                                        child: ListView.builder(
-                                            itemCount: myList.length,
-                                            itemBuilder: (context, index) {
 
-                                              //myList.forEach((element) {})
-                                              return ListTile(
-                                                title: Text("${myList}"),
-                                              );
-                                            }),
-                                      ),
-                                    );
-                                  });
-                            },
-                            child: Text(
-                              'selected products',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),*/
                         ],
                       ),
                     ),
@@ -1332,7 +1167,8 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                         onPressed: () {
                           if (_fullformKey.currentState.validate()) {
                             _fullformKey.currentState.save();
-                            createOrder(context);
+                            getLogin();
+                           // createOrder(context);
                           }
                         },
                         child: Center(
