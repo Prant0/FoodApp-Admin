@@ -22,7 +22,7 @@ class Pranto{
     'product_id': productId,
     'price': price,
     'quantity': quantity
-  }};
+  }.toString()};
 
 
 }
@@ -47,7 +47,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
       final uri = Uri.parse("https://apihomechef.antapp.space/api/admin/order/create");
       var map = Map<dynamic, dynamic>();
       print("value are the :${areaController.text.toString()},${cityController.text.toString()},${appertmentController.text.toString()}");
-      map['user_id'] = userId;
+      map['user_id'] = userId.toString();
       map['shipping_area'] =areaController.text.toString();
       map['shipping_contact'] =contactController.text.toString();
       map['shipping_appartment'] =appertmentController.text.toString();
@@ -56,16 +56,16 @@ class _CreateOrderPageState extends State<CreateOrderPage>
       map['shipping_city'] = cityController.text.toString();
       map['shipping_district'] = districController.text.toString();
       map['shipping_zip_code'] = zipController.text.toString();
-      map['product'] =myList;
-      print("body data areeeeeeeeeeeeee ${jsonEncode(map)}");
-      final response = await http.post(uri, 
+      map['product'] =myList.toList();
+      final response = await http.post(uri,
           body: jsonEncode(map),
-          
           headers: await CustomHttpRequest.getHeaderWithToken());
+      print("body data areeeeeeeeeeeeee ${jsonEncode(map)}");
       final data = jsonDecode(response.body);
       print(data);
       print("Pranto the login data are : $data");
-      if (response.statusCode==200) {
+      print("Pranto the login data are : $data");
+      if (response.statusCode==201) {
         setState(() {
           onProgress = false;
          print("status code 200");
@@ -135,7 +135,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
   }
 
   int price;
-  int totalPrice;
+  dynamic totalPrice;
   String productId;
   String productName;
 
@@ -162,10 +162,10 @@ class _CreateOrderPageState extends State<CreateOrderPage>
                   "$productId here not found matching product, so added");
               myList.add(
                 {
-                  'product_id': productId,
+                  "product_id": productId.toString(),
                   //'"product_name"': productName,
-                  'quantity': quantityController.text,
-                  'price': totalPrice,
+                  "quantity": quantityController.text,
+                  "price": totalPrice.toString(),
                 },
               );
               quantityController.text = '';
@@ -175,7 +175,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
               animate();
               print("added done");
               showInToast("Product Added Successfully");
-              print(myList);
+              print("product List are ${myList.toList()}");
 
             }
     }
