@@ -14,7 +14,6 @@ class EditProductProvider with ChangeNotifier{
   getProductData(context, int id, bool onProgress) async {
     onProgress = true;
     products = await CustomHttpRequest.getProductEditId(context, id);
-
     onProgress = false;
     notifyListeners();
   }

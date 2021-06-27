@@ -241,15 +241,7 @@ class _EditProductPageState extends State<EditProductPage> {
     initialData();
     super.initState();
   }
- /* @override
-  void didUpdateWidget(DropdownWidget oldWidget) {
-    if (this.currentItem != widget.currentItem) {
-      setState(() {
-        this.currentItem = widget.currentItem;
-      });
-    }
-    super.didUpdateWidget(oldWidget);
-  }*/
+
   @override
   void dispose() {
     nameController.dispose();
@@ -263,9 +255,6 @@ class _EditProductPageState extends State<EditProductPage> {
   @override
   Widget build(BuildContext context) {
     final productData = Provider.of<EditProductProvider>(context);
-    /*print("${productData.products.image}");*/
-    //categoryType = "${productData.products.foodItemCategory[0].name ?? ''}";
-
     final double height = MediaQuery.of(context).size.height;
     final double weidth = MediaQuery.of(context).size.width;
     return ModalProgressHUD(
@@ -563,7 +552,7 @@ class _EditProductPageState extends State<EditProductPage> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    // isPercentage = !isPercentage;
+                                   // isPercentage = !isPercentage;
                                     // isFixed = false;
                                     discount_type = "percent";
                                     _calcutateFix();
