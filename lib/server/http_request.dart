@@ -35,6 +35,16 @@ class CustomHttpRequest{
     return header;
   }
 
+  static Future<Map<String, String>> getHeaderWithToken2() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    var header = {
+      "Content-type": "application/json",
+      "Authorization": "bearer ${sharedPreferences.getString("token")}",
+    };
+    print("user token is :${sharedPreferences.getString('token')}");
+    return header;
+  }
+
   static Future<dynamic> getProfile() async {
     try {
       String url = "$uri/api/admin/profile";

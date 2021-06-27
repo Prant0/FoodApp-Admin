@@ -59,7 +59,7 @@ class _CreateOrderPageState extends State<CreateOrderPage>
       map['product'] =myList.toList();
       final response = await http.post(uri,
           body: jsonEncode(map),
-          headers: await CustomHttpRequest.getHeaderWithToken());
+          headers: await CustomHttpRequest.getHeaderWithToken2());
       print("body data areeeeeeeeeeeeee ${jsonEncode(map)}");
       final data = jsonDecode(response.body);
       print(data);
